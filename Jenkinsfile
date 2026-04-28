@@ -1,40 +1,33 @@
 pipeline {
     agent any // This defines where the pipeline runs (any available runner/node)
-
+    tools {
+        // This must match the name configured in Manage Jenkins -> Global Tool Configuration
+        maven 'Maven 21.0.11' 
+        jdk 'Java 21.0.11'
+    }
     stages {
         stage('Build') {
             steps {
-                echo 'Compiling the code...'
-                echo 'Compile complete.'
+                sh 'mvn clean compile'
             }
         }
 
-        stage('Test') {
-            // Jenkins runs steps sequentially by default. 
-            // To mimic GitLab's parallel jobs, we use a 'parallel' block.
-            parallel {
-                stage('Unit Test') {
-                    steps {
-                        echo 'Running unit tests... This will take about 60 seconds.'
-                        sleep 60
-                        echo 'Code coverage is 90%'
-                    }
-                }
-                stage('Lint Test') {
-                    steps {
-                        echo 'Linting code... This will take about 10 seconds.'
-                        sleep 10
-                        echo 'No lint issues found.'
-                    }
-                }
-            }
-        }
-
-        stage('Deploy') {
+        stage('Unit Tests') {
             steps {
-                // 'environment' in GitLab is handled here via logic or plugins
-                echo 'Deploying application to production...'
-                echo 'Application successfully deployed.'
+                sh 'mvn test'
+            }
+            post {
+                always {
+                    // This gathers the test results so you can see them in the Jenkins UI
+                    junit '**/target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                // This creates the .jar file in the target/ folder
+                sh 'mvn package'
             }
         }
     }
@@ -42,6 +35,7 @@ pipeline {
     post {
         success {
             echo 'Pipeline finished successfully!'
+            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true // This saves the .jar file as a build artifact
         }
         failure {
             echo 'Pipeline failed. Check the logs.'
