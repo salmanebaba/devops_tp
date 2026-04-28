@@ -30,6 +30,27 @@ pipeline {
                 sh 'mvn package'
             }
         }
+
+        stage('Deploy to Tomcat') {
+            steps {
+                echo 'Deploying to Tomcat Server...'
+                
+                // Method 1: Using the 'Deploy to container' plugin
+                // 'contextPath' is the URL suffix (e.g., http://localhost:8080/myapp)
+                deploy snippets: [
+                    containerAdapter: tomcat9(
+                        credentialsId: 'tomcat-credentials', // Created in Jenkins Credentials
+                        url: 'http://0.0.0.0:8081'
+                    ),
+                    contextPath: 'my-devops-app',
+                    war: 'target/*.war'
+                ]
+                
+                /* Method 2: If you don't want plugins, use a simple script (Manager App must be enabled):
+                sh "curl -u admin:password --upload-file target/*.war 'http://localhost:8080/manager/text/deploy?path=/my-devops-app&update=true'"
+                */
+            }
+        }
     }
 
     post {
