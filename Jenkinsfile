@@ -2,7 +2,7 @@ pipeline {
     agent any // This defines where the pipeline runs (any available runner/node)
     tools {
         // This must match the name configured in Manage Jenkins -> Global Tool Configuration
-        maven 'Maven 21.0.11' 
+        maven 'Maven 3.9.15' 
         jdk 'Java 21.0.11'
     }
     stages {
