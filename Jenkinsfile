@@ -38,7 +38,7 @@ pipeline {
                 deploy(
                     adapters: [tomcat9(
                         credentialsId: 'tomcat-credentials', 
-                        url: 'http://0.0.0.0:8080'
+                        url: 'http://0.0.0.0:8081'
                     )],
                     contextPath: 'devops_tp',
                     war: 'target/*.war'
