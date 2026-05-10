@@ -20,7 +20,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean compile' [cite: 3]
+                sh 'mvn clean compile'
             }
         }
 
@@ -30,14 +30,14 @@ pipeline {
             }
             post {
                 always {
-                    junit '**/target/surefire-reports/*.xml' [cite: 5]
+                    junit '**/target/surefire-reports/*.xml'
                 }
             }
         }
 
         stage('Package') {
             steps {
-                sh 'mvn package -DskipTests' [cite: 6]
+                sh 'mvn package -DskipTests'
             }
         }
 
@@ -57,11 +57,11 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline finished successfully!' [cite: 9]
-            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true [cite: 10]
+            echo 'Pipeline finished successfully!'
+            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
         }
         failure {
-            echo 'Pipeline failed. Check the logs.' [cite: 11]
+            echo 'Pipeline failed. Check the logs.'
         }
     }
 }
