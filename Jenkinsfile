@@ -40,7 +40,7 @@ pipeline {
                         url: 'http://localhost:8081'
                     )],
                     contextPath: 'devops_tp',
-                    war: 'target/*.war'
+                    war: 'target/*.jar'
                 )
             }
         }
