@@ -26,7 +26,6 @@ pipeline {
 
         stage('Package') {
             steps {
-                // This creates the .jar file in the target/ folder
                 sh 'mvn package'
             }
         }
