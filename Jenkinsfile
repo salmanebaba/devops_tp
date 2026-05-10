@@ -1,14 +1,26 @@
 pipeline {
-    agent any // This defines where the pipeline runs (any available runner/node)
+    agent any 
     tools {
-        // This must match the name configured in Manage Jenkins -> Global Tool Configuration
         maven 'Maven 3.9.15' 
         jdk 'Java 21.0.11'
     }
+
     stages {
+        stage('Initialize Environment') {
+            steps {
+                script {
+                    // Pre-loading tool paths to ensure 'mvn' and 'java' use Version 21 
+                    def mvnHome = tool 'Maven 3.9.15'
+                    def jdkHome = tool 'Java 21.0.11'
+                    env.PATH = "${mvnHome}/bin:${jdkHome}/bin:${env.PATH}"
+                    env.JAVA_HOME = "${jdkHome}"
+                }
+            }
+        }
+
         stage('Build') {
             steps {
-                sh 'mvn clean compile'
+                sh 'mvn clean compile' [cite: 3]
             }
         }
 
@@ -18,41 +30,38 @@ pipeline {
             }
             post {
                 always {
-                    // This gathers the test results so you can see them in the Jenkins UI
-                    junit '**/target/surefire-reports/*.xml'
+                    junit '**/target/surefire-reports/*.xml' [cite: 5]
                 }
             }
         }
 
         stage('Package') {
             steps {
-                sh 'mvn package'
+                sh 'mvn package -DskipTests' [cite: 6]
             }
         }
 
-        stage('Deploy to Tomcat') {
+        stage('Deploy (Run JAR)') {
             steps {
-                echo 'Deploying to Tomcat Server...'
-                
-                deploy(
-                    adapters: [tomcat9(
-                        credentialsId: 'tomcat-credentials', 
-                        url: 'http://0.0.0.0:8081'
-                    )],
-                    contextPath: 'devops_tp',
-                    war: 'target/*.war'
-                )
+                echo 'Starting the Spring Boot Application...'
+                // Since you are using JAR, we run it directly. 
+                // We kill any existing process on 8081 first to avoid port conflicts.
+                sh '''
+                    fuser -k 8081/tcp || true
+                    nohup java -jar target/*.jar --server.port=8081 > app.log 2>&1 &
+                '''
+                echo 'Application is running on http://localhost:8081'
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline finished successfully!'
-            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true // This saves the .jar file as a build artifact
+            echo 'Pipeline finished successfully!' [cite: 9]
+            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true [cite: 10]
         }
         failure {
-            echo 'Pipeline failed. Check the logs.'
+            echo 'Pipeline failed. Check the logs.' [cite: 11]
         }
     }
 }
