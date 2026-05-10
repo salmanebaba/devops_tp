@@ -40,7 +40,7 @@ pipeline {
                         url: 'http://localhost:8081'
                     )],
                     contextPath: 'devops_tp',
-                    war: 'target/*.jar'
+                    war: '**/target/*.war'
                 )
             }
         }
@@ -49,7 +49,7 @@ pipeline {
     post {
         success {
             echo 'Pipeline finished successfully!'
-            archiveArtifacts artifacts: 'target/*.war ', fingerprint: true
+            archiveArtifacts artifacts: 'target/*.war', fingerprint: true
         }
         failure {
             echo 'Pipeline failed. Check the logs.'
