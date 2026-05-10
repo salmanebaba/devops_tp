@@ -30,14 +30,18 @@ pipeline {
             }
         }
 
-        stage('Deploy (Run JAR)') {
+        stage('Deploy to Tomcat') {
             steps {
-                sh '''
-                    fuser -k 8081/tcp || true
-                    JAR=$(ls target/*.jar | grep -v original | head -n 1)
-                    echo "Running $JAR"
-                    nohup java -jar "$JAR" --server.port=8081 > app.log 2>&1 &
-                '''
+                echo 'Deploying to Tomcat Server...'
+                
+                deploy(
+                    adapters: [tomcat9(
+                        credentialsId: 'tomcat-credentials', 
+                        url: 'http://localhost:8081'
+                    )],
+                    contextPath: 'devops_tp',
+                    war: 'target/*.war'
+                )
             }
         }
     }
@@ -45,7 +49,7 @@ pipeline {
     post {
         success {
             echo 'Pipeline finished successfully!'
-            archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            archiveArtifacts artifacts: 'target/*.war ', fingerprint: true
         }
         failure {
             echo 'Pipeline failed. Check the logs.'
