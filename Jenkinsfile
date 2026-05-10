@@ -6,18 +6,6 @@ pipeline {
     }
 
     stages {
-        stage('Debug Java') {
-            steps {
-                sh '''
-                    which java
-                    java -version
-                    which javac
-                    javac -version
-                    echo $JAVA_HOME
-                '''
-            }
-        }
-
         
         stage('Build') {
             steps {
@@ -44,14 +32,12 @@ pipeline {
 
         stage('Deploy (Run JAR)') {
             steps {
-                echo 'Starting the Spring Boot Application...'
-                // Since you are using JAR, we run it directly. 
-                // We kill any existing process on 8081 first to avoid port conflicts.
                 sh '''
                     fuser -k 8081/tcp || true
-                    nohup java -jar target/*.jar --server.port=8081 > app.log 2>&1 &
+                    JAR=$(ls target/*.jar | grep -v original | head -n 1)
+                    echo "Running $JAR"
+                    nohup java -jar "$JAR" --server.port=8081 > app.log 2>&1 &
                 '''
-                echo 'Application is running on http://localhost:8081'
             }
         }
     }
