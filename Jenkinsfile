@@ -6,18 +6,7 @@ pipeline {
     }
 
     stages {
-        stage('Initialize Environment') {
-            steps {
-                script {
-                    // Pre-loading tool paths to ensure 'mvn' and 'java' use Version 21 
-                    def mvnHome = tool 'Maven 3.9.12'
-                    def jdkHome = tool 'Java 21.0.11'
-                    env.PATH = "${mvnHome}/bin:${jdkHome}/bin:${env.PATH}"
-                    env.JAVA_HOME = "${jdkHome}"
-                }
-            }
-        }
-
+        
         stage('Build') {
             steps {
                 sh 'mvn clean compile'
