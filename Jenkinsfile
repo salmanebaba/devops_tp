@@ -1,9 +1,22 @@
 pipeline {
     agent any 
     tools {
-        maven 'Maven 3.9.12' 
-        jdk 'Java 21.0.11'
+        jdk 'jdk21'
+        maven 'maven'
     }
+
+    stages {
+        stage('Debug Java') {
+            steps {
+                sh '''
+                    which java
+                    java -version
+                    which javac
+                    javac -version
+                    echo $JAVA_HOME
+                '''
+            }
+        }
 
     stages {
         
