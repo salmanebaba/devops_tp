@@ -35,7 +35,7 @@ pipeline {
                 echo 'Deploying to Tomcat Server...'
                 
                 deploy(
-                    adapters: [tomcat10(
+                    adapters: [tomcat9(
                         credentialsId: 'tomcat-credentials', 
                         url: 'http://localhost:8081'
                     )],
