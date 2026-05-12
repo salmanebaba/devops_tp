@@ -1,11 +1,11 @@
-FROM maven:3-jdk-8-alpine as builder
+FROM maven:3-jdk-8-alpine AS builder
 
 WORKDIR /usr/src/app
 
 COPY . /usr/src/app
 RUN mvn package
 
-FROM openjdk:8-jre-alpine
+FROM eclipse-temurin:8-jre-alpine
 
 COPY --from=builder /usr/src/app/target/*.jar /app.jar
 
