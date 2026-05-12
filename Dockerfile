@@ -1,9 +1,9 @@
-FROM eclipse-temurin:8-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /
 
-COPY target/*.jar app.jar
+COPY target/*.war app.war
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app.war"]
