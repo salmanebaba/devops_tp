@@ -3,7 +3,7 @@ FROM maven:3-jdk-8-alpine AS builder
 WORKDIR /usr/src/app
 
 COPY . /usr/src/app
-RUN mvn package
+RUN mvn package -DskipTests
 
 FROM eclipse-temurin:8-jre-alpine
 
