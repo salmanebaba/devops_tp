@@ -5,6 +5,11 @@ pipeline {
         maven 'Maven 3.9.12'
     }
 
+    environment {
+        IMAGE_NAME = "salmanebaba/devops"
+        IMAGE_TAG = "latest"
+    }
+
     stages {
         
         stage('Build') {
@@ -56,6 +61,28 @@ pipeline {
                 )
             }
         }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
+            }
+        }
+
+        // optional: push to Docker Hub
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push $IMAGE_NAME:$IMAGE_TAG
+                    '''
+                }
+            }
+       }
     }
 
     post {
